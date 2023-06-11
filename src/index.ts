@@ -29,13 +29,13 @@ const env = process.env as any;
  * This is necessary for all APIs.
  */
 const pool = ModPg.init({
-  user: env.DATABASE_USER,
-  host: env.DATABASE_HOST,
-  database: env.DATABASE_NAME,
-  password: env.DATABASE_PASS,
-  port: env.DATABASE_PORT,
-  max: 50,
-  statement_timeout: 10000
+  user: 'postgres',
+  host: 'localhost',
+  database: 'postgres',
+  password: 'postgres',
+  port: 5432,
+  max: 10,
+  statement_timeout: 10000,
 })
 
 /**
@@ -127,17 +127,38 @@ type Custom = {
  * step6:
  * Let's actually try making a request.
  */
-(async () => {
+(() => {
+  // Ignore this operation during testing
+  if ((process.env.NODE_ENV !== 'test')) {
+    execApi()
+  }
+})();
 
-  // await new Promise(resolve => setTimeout(resolve, 1000))
-  await pool.truncate(['members', 'sessions'])
+export async function execApi() {
+
+  await pool.truncate(['sessions', 'members'])
 
   /**
    * Check if registered with the username.
+   * 
+   * For the sake of visibility in operation verification, we're going through 'replyManager',
+   * but in reality, it's quite simple as follows.
+   * 
+   * ```
+   * n.DefaultAPI.findUser(user.name).then(
+   *   res => {
+   *     if (res.fail()) {
+   *       // fail process    
+   *     } else {
+   *       // success process
+   *     }
+   *   }
+   * )
+   * ```
    */
   replyManager('DefaultAPI.findUser', await n.DefaultAPI.findUser(
     user.name
-  ), user.userCredentials)
+  ), user.userCredentials, 200)
 
   /**
    * Register a user without two-factor authentication.
@@ -150,7 +171,7 @@ type Custom = {
     user.ip,
     user.sessionDevice,
     user.custom
-  ), user.userCredentials)
+  ), user.userCredentials, 201)
 
   /**
    * Confirm the session.
@@ -159,7 +180,7 @@ type Custom = {
     user.userCredentials.sessionToken,
     user.ip,
     user.sessionDevice
-  ))
+  ), null, 200)
 
   /**
    * Retrieve user details.
@@ -168,7 +189,7 @@ type Custom = {
     user.userCredentials.sessionToken,
     user.ip,
     user.sessionDevice
-  ))
+  ), null, 200)
 
   /**
    * Update custom columns. If you set options.clear: true, it will be formed only with what you set.
@@ -180,7 +201,7 @@ type Custom = {
     user.userCredentials.sessionToken,
     user.ip,
     user.sessionDevice
-  ))
+  ), null, 200)
 
   /**
    * User deletion
@@ -189,7 +210,7 @@ type Custom = {
     user.userCredentials.sessionToken,
     user.ip,
     user.sessionDevice
-  ))
+  ), null, 204)
 
   /**
    * Confirm that a deleted user causes an error when checking the session.
@@ -198,7 +219,7 @@ type Custom = {
     user.userCredentials.sessionToken,
     user.ip,
     user.sessionDevice
-  ))
+  ), null, 401)
 
   /**
    * Register a user with two-factor authentication.
@@ -214,7 +235,7 @@ type Custom = {
     {
       sendCompleatNotice: false
     }
-  ), user.userCredentials)
+  ), user.userCredentials, 201)
 
   /**
    * Two-factor authentication for user registration.
@@ -229,12 +250,12 @@ type Custom = {
     {
       sendCompleatNotice: false
     }
-  ), user.userCredentials)
+  ), user.userCredentials, 200)
 
   /**
    * AccountLock hook sample. except 401, 401, 429
    */
-  for (let i of [401, 401, 429]) {
+  for (let expectStatusCode of [401, 401, 429]) {
     replyManager('ImmediatelyAPI.loginUser with AccountLockHook', await n.ImmediatelyAPI.loginUser(
       user.name,
       user.mail,
@@ -260,10 +281,10 @@ type Custom = {
           },
         ]
       }
-    ), user.userCredentials)
+    ), user.userCredentials, expectStatusCode)
   }
 
-})()
+}
 
 /**
  * General process for operation confirmation.
@@ -272,12 +293,27 @@ let count = 0;
 function replyManager(
   apiName: string,
   res: any,
-  userCredentials?: typeof user['userCredentials'] | any
+  userCredentials?: typeof user['userCredentials'] | any,
+  expectStatusCode?: number,
 ) {
-  console.log(`[REQUEST:${++count}]`, apiName, ' => ', res.statusCode, res.body)
+  
+  // logs test only
+  if ((process.env.NODE_ENV !== 'test')) {
+    console.log(`[REQUEST:${++count}]`, apiName, ' => ', res.statusCode, res.body)
+  }
+  
+  // test failed
+  if (expectStatusCode && res?.statusCode != expectStatusCode) throw {
+    message: `different than expected. ${apiName} expected: ${expectStatusCode}, Actual: ${res?.statusCode}`
+  }
+  
+  // api failed
   if (res.fail()) {
     return;
   }
+
+  if (!userCredentials) return
+
   if (res?.body?.session_token) {
     userCredentials.sessionToken = res.body.session_token
   }
