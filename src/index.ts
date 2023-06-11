@@ -1,3 +1,20 @@
+/*
+  COMMAND SAMPLE:
+  $ npm install
+  $ docker-compose -f docker-pg.yml up --build
+  $ npx ninsho-cli@latest create-table
+  $ npm run dev
+*/
+
+/**
+ * Declaring Required Packages
+ * 
+ * Please install in advance.
+ * $ npm i ninsho
+ * $ npm i ninsho-module-secure ninsho-module-pg ninsho-module-mailer
+ * $ npm i ninsho-plugin-essential-api ninsho-plugin-immediately-api ninsho-plugin-standard-2fa-api
+ * $ npm i ninsho-hook-account-lock
+ */
 import { ninsho } from 'ninsho'
 import ModSecure from 'ninsho-module-secure'
 import ModPg from 'ninsho-module-pg'
@@ -6,14 +23,6 @@ import EssentialPI from 'ninsho-plugin-essential-api'
 import ImmediatelyAPI from 'ninsho-plugin-immediately-api'
 import Standard2faAPI from 'ninsho-plugin-standard-2fa-api'
 import AccountLockHook from 'ninsho-hook-account-lock'
-
-/*
-  USAGE:
-  $ npm install
-  $ docker-compose -f docker-pg.yml up --build
-  $ npx ninsho-cli@latest create-table
-  $ npm run dev
-*/
 
 /**
  * Database connection information and email configuration information are written
