@@ -1,5 +1,8 @@
 # ninsho-example
 
+[![build and publish](https://github.com/ninsho/ninsho-example/actions/workflows/run-build-and-publish.yml/badge.svg)](https://github.com/ninsho/ninsho-example/actions/workflows/run-build-and-publish.yml)
+[![Coverage Status](https://coveralls.io/repos/github/ninsho/ninsho-example/badge.svg?branch=main)](https://coveralls.io/github/ninsho/ninsho-example?branch=main)
+
 # USAGE:
 ```js
 $ npm install

@@ -1,4 +1,4 @@
-import { execApi } from ".."
+import { execApi } from "../index"
 
 describe('example', () => {
 
@@ -6,6 +6,7 @@ describe('example', () => {
     try {
       await execApi()
     } catch(e) {
+      console.log('fail')
       throw e
     }
   })
