@@ -1,6 +1,6 @@
 {
   "name": "ninsho-example",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -14,14 +14,14 @@
   },
   "dependencies": {
     "dotenv": "^16.0.3",
-    "ninsho": "^0.0.17",
-    "ninsho-hook-account-lock": "^0.0.5",
-    "ninsho-module-mailer": "^0.0.8",
-    "ninsho-module-pg": "^0.0.11",
-    "ninsho-module-secure": "^0.0.16",
-    "ninsho-plugin-essential-api": "^0.0.6",
-    "ninsho-plugin-immediately-api": "^0.0.6",
-    "ninsho-plugin-standard-2fa-api": "^0.0.5",
+    "ninsho": "^0.0.19",
+    "ninsho-hook-account-lock": "^0.0.6",
+    "ninsho-module-mailer": "^0.0.9",
+    "ninsho-module-pg": "^0.0.12",
+    "ninsho-module-secure": "^0.0.17",
+    "ninsho-plugin-essential-api": "^0.0.7",
+    "ninsho-plugin-immediately-api": "^0.0.7",
+    "ninsho-plugin-standard-2fa-api": "^0.0.6",
     "nodemailer": "^6.9.1"
   },
   "devDependencies": {
